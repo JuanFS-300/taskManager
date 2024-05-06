@@ -6,29 +6,29 @@ public class Main {
 
     public static void main(String[] args) {
 
-        List<TarefasData> datas = AcessoDados.leArquivo("files/animais.csv");
+        List<Funcao> funcoes = AcessoDados.leArquivo("C:\\Users\\juanf\\Downloads\\taskManager.csv");
 
         System.out.println("");
         System.out.println("No teste animais");
 
-        for(TarefasData data: datas){
-            System.out.println(data);
+        for(Funcao funcao: funcoes){
+            System.out.println(funcao);
         }
 
-        datas.add(new TarefasData(0, 0, 0));
+        funcoes.add(new Funcao());
         //animais.add(new Animal("francis", 7, 2));
 
         System.out.println("");
         //System.out.println("No teste animais depois de incluir um animal novo");
 
-        for(TarefasData data: datas){
-            System.out.println(data);
+        for(Funcao funcao: funcoes){
+            System.out.println(funcao);
         }
 
-       /* for(int i=0; i<datas.size(); i++){
-        	TarefasData data = datas.get(i);
-            if(data.getDataDia().equals()){
-                datas.remove(i);
+      /* for(int i=0; i<funcoes.size(); i++){
+        	Funcao funcao = funcoes.get(i);
+            if(funcao.get().equals()){
+                funcoes.remove(i);
                 break;
             }
         }*/
@@ -36,7 +36,7 @@ public class Main {
         System.out.println("");
         System.out.println("No teste animais depois de retirar o vacilo");
 
-     //   AcessoDados.saveArquivo(datas, "files/animais.csv");
+       AcessoDados.saveArquivo(funcoes, "C:\\\\Users\\\\juanf\\\\Downloads\\\\taskManager.csv");
 
 
 
