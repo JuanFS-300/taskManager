@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class AcessoDados {
-    public static List<TarefasData> leArquivo(String filePath){
+    public static List<Funcao> leArquivo(String filePath){
 
         try ( InputStream is = new FileInputStream(filePath);
                 InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
@@ -39,13 +39,13 @@ public class AcessoDados {
 		return null;
     }
     
-    public static void saveArquivo(List<String> linhas, String filePath){
+    public static void saveArquivo(List<Funcao> funcoes, String filePath){
 
         try( OutputStream os = new FileOutputStream(filePath);
                 OutputStreamWriter osw = new OutputStreamWriter(os, StandardCharsets.UTF_8);
                 PrintWriter pw = new PrintWriter(osw, true);
                 ){
-            for(String linha: linhas){
+            for(Funcao linha: funcoes){
                 pw.println(linha);
             }
 
