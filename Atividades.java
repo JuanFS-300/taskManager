@@ -7,17 +7,29 @@ public class Atividades {
     private int duracao;
     private String prioridade;
     private String usuario;
+    private int idAtividade;
 
-    public Atividades(String categoria, String nome, String descricao, int duracao, String prioridade, String usuario) {
+    public Atividades(String categoria, String nome, String descricao, int duracao, String prioridade, String usuario, int idAtividade) {
         this.categoria = categoria;
         this.nome = nome;
         this.descricao = descricao;
         this.duracao = duracao;
         this.prioridade = prioridade;
         this.usuario = usuario;
+        this.idAtividade = idAtividade;
     }
+    
+    public int getIdAtividade() {
+		return idAtividade;
+	}
 
-    public String getCategoria() {
+	public void setIdAtividade(int idAtividade) {
+		this.idAtividade = idAtividade;
+	}
+
+
+
+	public String getCategoria() {
         return this.categoria;
     }
 
