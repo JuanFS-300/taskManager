@@ -1,42 +1,29 @@
 package taskManager;
-
+//import java.util.ArrayList;
+//import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        List<Funcao> funcoes = AcessoDados.leArquivo("C:\\Users\\juanf\\Downloads\\taskManager.csv");
+        List<Atividades> funcoes = AcessoDados.leArquivo("C:\\Users\\juanf\\Downloads\\taskManager.csv");
+        int idAtividade = 1;
+     
+            System.out.println(funcoes);
+        
 
-        System.out.println("");
-        System.out.println("No teste animais");
+        // Buscando a atividade na lista
+        Atividades atividadeEncontrada = Funcao.buscarAtividade(funcoes, idAtividade);
 
-        for(Funcao funcao: funcoes){
-            System.out.println(funcao);
+        if (atividadeEncontrada != null) {
+            System.out.println("Atividade encontrada: " + atividadeEncontrada.getDescricao());
+        } else {
+            System.out.println("Atividade com o ID " + idAtividade + " não encontrada.");
         }
-
-        funcoes.add(new Funcao());
-        //animais.add(new Animal("francis", 7, 2));
-
-        System.out.println("");
-        //System.out.println("No teste animais depois de incluir um animal novo");
-
-        for(Funcao funcao: funcoes){
-            System.out.println(funcao);
-        }
-
-      /* for(int i=0; i<funcoes.size(); i++){
-        	Funcao funcao = funcoes.get(i);
-            if(funcao.get().equals()){
-                funcoes.remove(i);
-                break;
-            }
-        }*/
-
-        System.out.println("");
-        System.out.println("No teste animais depois de retirar o vacilo");
-
-       AcessoDados.saveArquivo(funcoes, "C:\\\\Users\\\\juanf\\\\Downloads\\\\taskManager.csv");
+   		 
+	     
+    //   AcessoDados.saveArquivo(funcoes, "C:\\\\Users\\\\juanf\\\\Downloads\\\\taskManager.csv");
 
 
 
