@@ -1,18 +1,30 @@
 package taskManager;
 
 public class TarefasData {
+	 private int idData;
 	 private int dataDia;
 	 private int dataMes;
 	 private int dataAno;
 		
-	 public TarefasData(int dataDia, int dataMes, int dataAno) {
+	 public TarefasData(int idData, int dataDia, int dataMes, int dataAno) {
 	  super();
+	  this.idData = idData;
 	  this.dataDia = dataDia;
 	  this.dataMes = dataMes;
 	  this.dataAno = dataAno;
 	 }
 		
-	 public int getDataDia() {
+	 public int getIdData() {
+		return idData;
+	}
+
+	public void setIdData(int idData) {
+		this.idData = idData;
+	}
+
+
+
+	public int getDataDia() {
 	  return dataDia;
 	 }
 
