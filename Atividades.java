@@ -5,10 +5,10 @@ package taskManager;
 	    private String categoria;
 	    private String nome;
 	    private String descricao;
-	    private int duracao;
+	    private String duracao;
 	    private int idAtividade;
 
-	    public Atividades(String categoria, String nome, String descricao, int duracao,int idAtividade) {
+	    public Atividades(String categoria, String nome, String descricao, String duracao,int idAtividade) {
 	        this.categoria = categoria;
 	        this.nome = nome;
 	        this.descricao = descricao;
@@ -17,7 +17,7 @@ package taskManager;
 	    }
 	    
 	    public int getIdAtividade() {
-			return idAtividade;
+			return this.idAtividade;
 		}
 
 		public void setIdAtividade(int idAtividade) {
@@ -50,18 +50,19 @@ package taskManager;
 	        this.descricao = descricao;
 	    }
 
-	    public int getDuracao() {
+	    public String getDuracao() {
 	        return this.duracao;
 	    }
 
-	    public void setDuracao(int duracao) {
+	    public void setDuracao(String duracao) {
 	        this.duracao = duracao;
 	    }
 
 	    @Override
-	    public String toString(){
-	        return this.nome;
-	    }
+		public String toString() {
+			return categoria + "," + nome + "," + descricao + ","
+					+ duracao + "," + idAtividade;
+		}
+	    
 	}
-
 
