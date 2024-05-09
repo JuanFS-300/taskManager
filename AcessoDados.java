@@ -1,17 +1,17 @@
 package taskManager;
 
-	import java.io.BufferedReader;
-	import java.io.FileInputStream;
-	import java.io.IOException;
-	import java.io.InputStream;
-	import java.io.InputStreamReader;
-	import java.io.FileOutputStream;
-	import java.io.OutputStream;
-	import java.io.OutputStreamWriter;
-	import java.io.PrintWriter;
-	import java.nio.charset.StandardCharsets;
-	import java.util.ArrayList;
-	import java.util.List;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 	public class AcessoDados {
 	    public static List<Atividades> leArquivo(String filePath){
@@ -24,44 +24,33 @@ package taskManager;
 	            ){
 	            String linha;
 	            while((linha = br.readLine()) != null){
-
-	               
-
-	                String[] palavras = linha.split(",");
-
-	                for(String p: palavras){
-	                    System.out.println("palavra: " + p);
-	                }
-	                String nome = palavras[1];
-	                
-	                 String categoria = palavras[4];
-	                
-	                 String descricao = palavras[2];;
-	                int duracao =Integer.parseInt(palavras[3]);;
-	                 String prioridade = palavras[5];;
-	                 
-	                 int idAtividade = 1;
-
-	                Atividades atividade = new Atividades(categoria, nome,descricao, duracao, idAtividade);
-	                atividades.add(atividade);
-	               
-	                
-
+                      
+	                	 String[] parts = linha.split(",");
+	             
+	                	   String categoria = parts[0];
+	                       String nome = parts[1];
+	                       String descricao = parts[2];
+	                       String duracao = parts[3];
+	                       int id = Integer.parseInt(parts[4]);
+	                   
+	                    
+						Atividades atividade = new Atividades(categoria, nome,descricao, duracao, id);
+	 	                atividades.add(atividade);
 	            }
 
 	        }catch(IOException e){
 	            e.printStackTrace();
-	        }*/
+	        }
 			return atividades;
 	    }
 	    
-	    public static void saveArquivo(List<Atividades> funcoes, String filePath){
+	    public static void saveArquivo(List<Atividades> atividades, String filePath){
 
 	        try( OutputStream os = new FileOutputStream(filePath);
 	                OutputStreamWriter osw = new OutputStreamWriter(os, StandardCharsets.UTF_8);
 	                PrintWriter pw = new PrintWriter(osw, true);
 	                ){
-	            for(Atividades linha: funcoes){
+	            for(Atividades linha: atividades){
 	                pw.println(linha);
 	            }
 
