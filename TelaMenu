@@ -1,0 +1,245 @@
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+
+class Tarefa {
+    private String nome;
+    private String descricao;
+    private String data;
+    private String categoria;
+
+    public Tarefa(String nome, String descricao, String data, String categoria) {
+        this.nome = nome;
+        this.descricao = descricao;
+        this.data = data;
+        this.categoria = categoria;
+    }
+
+    public String getNome() { return nome; }
+    public String getDescricao() { return descricao; }
+    public String getData() { return data; }
+    public String getCategoria() { return categoria; }
+
+    @Override
+    public String toString() {
+        return "Nome: " + nome + ", Data: " + data + ", Categoria: " + categoria;
+    }
+}
+
+class TelaMenu extends JFrame {
+
+    private CardLayout cardLayout;
+    private JPanel painelPrincipal;
+    private List<Tarefa> tarefas;
+
+    public TelaMenu() {
+        tarefas = new ArrayList<>(); // Armazena as tarefas
+
+        // Configuração da janela principal
+        setTitle("Task Manager");
+        setSize(500, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+
+        // Configura barra de menu
+        JMenuBar menuBar = new JMenuBar();
+        JMenu menu = new JMenu("Menu");
+        JMenuItem adicionarTarefaItem = new JMenuItem("Adicionar Tarefa");
+        JMenuItem listarTarefasItem = new JMenuItem("Listar Tarefas");
+        JMenuItem filtrarTarefasItem = new JMenuItem("Filtrar Tarefas");
+        JMenuItem voltar = new JMenuItem("Voltar à tela inicial");
+
+        menu.add(adicionarTarefaItem);
+        menu.add(listarTarefasItem);
+        menu.add(filtrarTarefasItem);
+        menu.add(voltar);
+        menuBar.add(menu);
+        setJMenuBar(menuBar);
+
+        // Configuração do painel principal com CardLayout
+        cardLayout = new CardLayout();
+        painelPrincipal = new JPanel(cardLayout);
+
+        // Adiciona as telas ao painel principal
+        painelPrincipal.add(criarTelaBoasVindas(), "Tela Boas Vindas");
+        painelPrincipal.add(criarTelaAdicionarTarefa(), "Tela Adicionar Tarefa");
+        painelPrincipal.add(criarTelaListarTarefas(), "Tela Listar Tarefas");
+        painelPrincipal.add(criarTelaFiltrarTarefas(), "Tela Filtrar Tarefas");
+        
+        add(painelPrincipal, BorderLayout.CENTER);
+
+        // Eventos para alternar entre as telas
+        adicionarTarefaItem.addActionListener(e -> cardLayout.show(painelPrincipal, "Tela Adicionar Tarefa"));
+        listarTarefasItem.addActionListener(e -> {
+            atualizarListaTarefas();
+            cardLayout.show(painelPrincipal, "Tela Listar Tarefas");
+        });
+        filtrarTarefasItem.addActionListener(e -> cardLayout.show(painelPrincipal, "Tela Filtrar Tarefas"));
+        voltar.addActionListener(e -> cardLayout.show(painelPrincipal, "Tela Boas Vindas"));
+    }
+
+    private JPanel criarTelaBoasVindas() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);  // Espaçamento entre os componentes
+
+        // Configuração da mensagem de boas-vindas
+        JLabel mensagemBoasVindas = new JLabel("Bem-vindo ao Task Manager!", JLabel.CENTER);
+        mensagemBoasVindas.setFont(new Font("Arial", Font.BOLD, 16));
+
+        // Configurações de posicionamento da mensagem
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.CENTER;
+        panel.add(mensagemBoasVindas, gbc);
+
+        // Painel para os botões de navegação
+        JPanel botoesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        JButton btnAdicionarTarefa = new JButton("Adicionar Tarefa");
+        JButton btnListarTarefas = new JButton("Listar Tarefas");
+        JButton btnFiltrarTarefas = new JButton("Filtrar Tarefas");
+
+        botoesPanel.add(btnAdicionarTarefa);
+        botoesPanel.add(btnListarTarefas);
+        botoesPanel.add(btnFiltrarTarefas);
+
+        // Configurações de posicionamento dos botões
+        gbc.gridy = 1;
+        panel.add(botoesPanel, gbc);
+
+        // Ações dos botões
+        btnAdicionarTarefa.addActionListener(e -> cardLayout.show(painelPrincipal, "Tela Adicionar Tarefa"));
+        btnListarTarefas.addActionListener(e -> {
+            atualizarListaTarefas();
+            cardLayout.show(painelPrincipal, "Tela Listar Tarefas");
+        });
+        btnFiltrarTarefas.addActionListener(e -> cardLayout.show(painelPrincipal, "Tela Filtrar Tarefas"));
+
+        return panel;
+    }
+
+
+    private JPanel criarTelaAdicionarTarefa() {
+        JPanel panel = new JPanel(new BorderLayout());
+        JPanel formPanel = new JPanel(new GridLayout(7, 1));
+
+        JTextField nomeField = new JTextField();
+        JTextField descricaoField = new JTextField();
+        JTextField categoriaField = new JTextField();
+
+        // Configuração dos campos de data: Dia, Mês, Ano
+        JPanel dataPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JTextField dataFieldDia = new JTextField(2);
+        JTextField dataFieldMes = new JTextField(2);
+        JTextField dataFieldAno = new JTextField(4);
+        
+        dataPanel.add(new JLabel("Dia:"));
+        dataPanel.add(dataFieldDia);
+        dataPanel.add(new JLabel("Mês:"));
+        dataPanel.add(dataFieldMes);
+        dataPanel.add(new JLabel("Ano:"));
+        dataPanel.add(dataFieldAno);
+
+        JButton adicionarButton = new JButton("Adicionar");
+       // JButton voltarButton = new JButton("Voltar à Tela Inicial");
+
+        formPanel.add(new JLabel("Nome da Tarefa:"));
+        formPanel.add(nomeField);
+        formPanel.add(new JLabel("Descrição:"));
+        formPanel.add(descricaoField);
+        formPanel.add(dataPanel);  // Adicionando o painel de data ao formulário
+        formPanel.add(new JLabel("Categoria:"));
+        formPanel.add(categoriaField);
+
+        panel.add(formPanel, BorderLayout.CENTER);
+        panel.add(adicionarButton, BorderLayout.SOUTH);
+       // panel.add(voltarButton, BorderLayout.NORTH);
+
+        adicionarButton.addActionListener(e -> {
+            String nome = nomeField.getText();
+            String descricao = descricaoField.getText();
+            String data = dataFieldDia.getText() + "/" + dataFieldMes.getText() + "/" + dataFieldAno.getText();
+            String categoria = categoriaField.getText();
+            tarefas.add(new Tarefa(nome, descricao, data, categoria));
+            JOptionPane.showMessageDialog(this, "Tarefa adicionada com sucesso!");
+            nomeField.setText("");
+            descricaoField.setText("");
+            dataFieldDia.setText("");
+            dataFieldMes.setText("");
+            dataFieldAno.setText("");
+            categoriaField.setText("");
+        });
+
+     //   voltarButton.addActionListener(e -> cardLayout.show(painelPrincipal, "Tela Boas Vindas"));
+
+        return panel;
+    }
+
+    private JPanel criarTelaListarTarefas() {
+        JPanel panel = new JPanel(new BorderLayout());
+        JTextArea areaTarefas = new JTextArea();
+        areaTarefas.setEditable(false);
+        panel.add(new JScrollPane(areaTarefas), BorderLayout.CENTER);
+
+       // JButton voltarButton = new JButton("Voltar à Tela Inicial");
+       // panel.add(voltarButton, BorderLayout.NORTH);
+
+        atualizarListaTarefas();
+
+     //   voltarButton.addActionListener(e -> cardLayout.show(painelPrincipal, "Tela Boas Vindas"));
+
+        return panel;
+    }
+
+    private void atualizarListaTarefas() {
+        JTextArea areaTarefas = new JTextArea();
+        StringBuilder tarefasTexto = new StringBuilder();
+        for (Tarefa tarefa : tarefas) {
+            tarefasTexto.append(tarefa.toString()).append("\n");
+        }
+        areaTarefas.setText(tarefasTexto.toString());
+    }
+
+    private JPanel criarTelaFiltrarTarefas() {
+        JPanel panel = new JPanel(new BorderLayout());
+        JPanel filterPanel = new JPanel(new GridLayout(2, 2));
+        JTextField categoriaField = new JTextField();
+        JButton filtrarButton = new JButton("Filtrar");
+        JTextArea areaFiltrada = new JTextArea();
+        areaFiltrada.setEditable(false);
+
+      //  JButton voltarButton = new JButton("Voltar à Tela Inicial");
+
+        filterPanel.add(new JLabel("Categoria:"));
+        filterPanel.add(categoriaField);
+        filterPanel.add(new JLabel(""));
+        filterPanel.add(filtrarButton);
+
+        panel.add(filterPanel, BorderLayout.NORTH);
+        panel.add(new JScrollPane(areaFiltrada), BorderLayout.CENTER);
+     //   panel.add(voltarButton, BorderLayout.SOUTH);
+
+        filtrarButton.addActionListener(e -> {
+            String categoriaFiltro = categoriaField.getText();
+            StringBuilder tarefasFiltradasTexto = new StringBuilder();
+            for (Tarefa tarefa : tarefas) {
+                if (tarefa.getCategoria().equalsIgnoreCase(categoriaFiltro)) {
+                    tarefasFiltradasTexto.append(tarefa.toString()).append("\n");
+                }
+            }
+            areaFiltrada.setText(tarefasFiltradasTexto.toString());
+        });
+
+    //    voltarButton.addActionListener(e -> cardLayout.show(painelPrincipal, "Tela Boas Vindas"));
+
+        return panel;
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            TelaMenu app = new TelaMenu();
+            app.setVisible(true);
+        });
+    }
+}
