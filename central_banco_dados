@@ -1,0 +1,71 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.Statement;
+
+public class central_banco_dados {
+	private final static String USER = "root";
+	private final static String PASS = "Jfsc2003_";
+	private final static String DATABASE = "TaskManager";
+	private final static String URL = "jdbc:mysql://localhost:3306/" + DATABASE;
+	
+	
+	static boolean testaConnection() {
+		
+		try(Connection c = DriverManager.getConnection(URL, USER, PASS)){
+			System.out.println("conexao feita");
+		}catch(Exception e) {
+			e.printStackTrace();
+			
+		}
+		
+		return false;
+	}
+	
+static boolean testaStatement() {
+		
+		try(Connection c = DriverManager.getConnection(URL, USER, PASS)){
+			// adicionar linha com comando de adição
+			String comando = "INSERT INTO Tarefas (id, nome_tarefa, categoria, descricao, data_id) VALUES\r\n" + 
+					"(7, 'Comprar material', 'Faculdade', 'Comprar material de estudo', 3);";
+			Statement s = c.createStatement();
+			int res = s.executeUpdate(comando);
+			System.out.println("resultado: " + res);
+		}catch(SQLIntegrityConstraintViolationException e) {
+			System.out.println("Nao foi possivel adicionar: " + e.getMessage());
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return false;
+	}
+	
+	static boolean testaResult() {
+		
+		try(Connection c = DriverManager.getConnection(URL, USER, PASS)){
+			String comando = "SELECT * FROM Tarefas";
+			Statement s = c.createStatement();
+			ResultSet rs = s.executeQuery(comando);
+			while(rs.next()) {
+				//System.out.println("Nome: " + rs.getString("nome"));
+				System.out.println("Nome Atividade: " + rs.getString("nome_tarefa"));
+				//System.out.println("");
+			}
+		}catch(SQLIntegrityConstraintViolationException e) {
+			System.out.println("Nao foi possivel adicionar: " + e.getMessage());
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return false;
+	}
+	
+	
+	
+	public static void main(String[] args) {
+		testaResult();
+	}
+}
