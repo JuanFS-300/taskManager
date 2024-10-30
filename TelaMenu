@@ -156,6 +156,25 @@ class TelaMenu extends JFrame {
         panel.add(adicionarButton, BorderLayout.SOUTH);
        // panel.add(voltarButton, BorderLayout.NORTH);
 
+    
+        adicionarButton.addActionListener(e -> {
+            String nome_tarefa = nomeField.getText();
+            String descricao = descricaoField.getText();
+        //    int data_id = dataFieldDia.getText() + "/" + dataFieldMes.getText() + "/" + dataFieldAno.getText();
+            String categoria = categoriaField.getText();
+
+            TarefaController tarefaController = new TarefaController();
+            tarefaController.adicionarTarefa(nome_tarefa, descricao, categoria);
+
+            // Limpa os campos após a adição
+            nomeField.setText("");
+            descricaoField.setText("");
+            dataFieldDia.setText("");
+            dataFieldMes.setText("");
+            dataFieldAno.setText("");
+            categoriaField.setText("");
+        });
+
         adicionarButton.addActionListener(e -> {
             String nome = nomeField.getText();
             String descricao = descricaoField.getText();
