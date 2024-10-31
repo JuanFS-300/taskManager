@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
@@ -72,7 +73,7 @@ class TelaMenu extends JFrame {
         // Eventos para alternar entre as telas
         adicionarTarefaItem.addActionListener(e -> cardLayout.show(painelPrincipal, "Tela Adicionar Tarefa"));
         listarTarefasItem.addActionListener(e -> {
-            atualizarListaTarefas();
+          //  atualizarListaTarefas();
             cardLayout.show(painelPrincipal, "Tela Listar Tarefas");
         });
         filtrarTarefasItem.addActionListener(e -> cardLayout.show(painelPrincipal, "Tela Filtrar Tarefas"));
@@ -111,12 +112,13 @@ class TelaMenu extends JFrame {
         // Ações dos botões
         btnAdicionarTarefa.addActionListener(e -> cardLayout.show(painelPrincipal, "Tela Adicionar Tarefa"));
         btnListarTarefas.addActionListener(e -> {
-            atualizarListaTarefas();
+        //    atualizarListaTarefas();
             cardLayout.show(painelPrincipal, "Tela Listar Tarefas");
         });
         btnFiltrarTarefas.addActionListener(e -> cardLayout.show(painelPrincipal, "Tela Filtrar Tarefas"));
 
         return panel;
+       //atualizarListaTarefas();
     }
 
 
@@ -126,14 +128,12 @@ class TelaMenu extends JFrame {
 
         JTextField nomeField = new JTextField();
         JTextField descricaoField = new JTextField();
-        JTextField categoriaField = new JTextField();
-
-        // Configuração dos campos de data: Dia, Mês, Ano
-        JPanel dataPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JTextField dataFieldDia = new JTextField(2);
         JTextField dataFieldMes = new JTextField(2);
         JTextField dataFieldAno = new JTextField(4);
-        
+
+        // Painel para data
+        JPanel dataPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         dataPanel.add(new JLabel("Dia:"));
         dataPanel.add(dataFieldDia);
         dataPanel.add(new JLabel("Mês:"));
@@ -142,29 +142,33 @@ class TelaMenu extends JFrame {
         dataPanel.add(dataFieldAno);
 
         JButton adicionarButton = new JButton("Adicionar");
-       // JButton voltarButton = new JButton("Voltar à Tela Inicial");
+
+        // Criando o JComboBox para categorias
+        String[] categorias = {"Estudos", "Doméstico", "Trabalho", "Variados"};
+        JComboBox<String> categoriaComboBox = new JComboBox<>(categorias);
 
         formPanel.add(new JLabel("Nome da Tarefa:"));
         formPanel.add(nomeField);
         formPanel.add(new JLabel("Descrição:"));
         formPanel.add(descricaoField);
-        formPanel.add(dataPanel);  // Adicionando o painel de data ao formulário
+        formPanel.add(dataPanel);
         formPanel.add(new JLabel("Categoria:"));
-        formPanel.add(categoriaField);
+        formPanel.add(categoriaComboBox); // Adicionando JComboBox para categorias
 
         panel.add(formPanel, BorderLayout.CENTER);
         panel.add(adicionarButton, BorderLayout.SOUTH);
-       // panel.add(voltarButton, BorderLayout.NORTH);
 
-    
         adicionarButton.addActionListener(e -> {
             String nome_tarefa = nomeField.getText();
             String descricao = descricaoField.getText();
-        //    int data_id = dataFieldDia.getText() + "/" + dataFieldMes.getText() + "/" + dataFieldAno.getText();
-            String categoria = categoriaField.getText();
-
+            String data_dia = dataFieldDia.getText();
+            String data_mes = dataFieldMes.getText();
+            String data_ano = dataFieldAno.getText();
+            String categoria = (String) categoriaComboBox.getSelectedItem(); // Obtendo a categoria selecionada
+            
+            
             TarefaController tarefaController = new TarefaController();
-            tarefaController.adicionarTarefa(nome_tarefa, descricao, categoria);
+            tarefaController.adicionarTarefa(nome_tarefa, descricao, categoria, data_dia, data_mes, data_ano);
 
             // Limpa os campos após a adição
             nomeField.setText("");
@@ -172,53 +176,112 @@ class TelaMenu extends JFrame {
             dataFieldDia.setText("");
             dataFieldMes.setText("");
             dataFieldAno.setText("");
-            categoriaField.setText("");
+            categoriaComboBox.setSelectedIndex(0); // Reseta a seleção do JComboBox
         });
-
-        adicionarButton.addActionListener(e -> {
-            String nome = nomeField.getText();
-            String descricao = descricaoField.getText();
-            String data = dataFieldDia.getText() + "/" + dataFieldMes.getText() + "/" + dataFieldAno.getText();
-            String categoria = categoriaField.getText();
-            tarefas.add(new Tarefa(nome, descricao, data, categoria));
-            JOptionPane.showMessageDialog(this, "Tarefa adicionada com sucesso!");
-            nomeField.setText("");
-            descricaoField.setText("");
-            dataFieldDia.setText("");
-            dataFieldMes.setText("");
-            dataFieldAno.setText("");
-            categoriaField.setText("");
-        });
-
-     //   voltarButton.addActionListener(e -> cardLayout.show(painelPrincipal, "Tela Boas Vindas"));
 
         return panel;
     }
 
     private JPanel criarTelaListarTarefas() {
         JPanel panel = new JPanel(new BorderLayout());
+        
+        // Configuração da área de texto
         JTextArea areaTarefas = new JTextArea();
         areaTarefas.setEditable(false);
+        areaTarefas.setFont(new Font("Arial", Font.PLAIN, 14));
+        areaTarefas.setForeground(Color.DARK_GRAY);
+        areaTarefas.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1), 
+            BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        areaTarefas.setBackground(new Color(240, 248, 255)); // Cor de fundo suave
+
         panel.add(new JScrollPane(areaTarefas), BorderLayout.CENTER);
 
-       // JButton voltarButton = new JButton("Voltar à Tela Inicial");
-       // panel.add(voltarButton, BorderLayout.NORTH);
+        // Painel de opções
+        JPanel optionsPanel = new JPanel(new FlowLayout());
+        String[] opcoes = {"Listar Todas", "Listar Ordenadas"};
+        JComboBox<String> comboBox = new JComboBox<>(opcoes);
+        JLabel criterioLabel = new JLabel("Critério:");
+        criterioLabel.setVisible(false);
+        JTextField criterioField = new JTextField(10);
+        criterioField.setVisible(false);
 
-        atualizarListaTarefas();
+        JButton listarButton = new JButton("Listar");
+        TarefaController tarefaController = new TarefaController();
 
-     //   voltarButton.addActionListener(e -> cardLayout.show(painelPrincipal, "Tela Boas Vindas"));
+        optionsPanel.add(comboBox);
+        optionsPanel.add(criterioLabel);
+        optionsPanel.add(criterioField);
+        optionsPanel.add(listarButton);
+        panel.add(optionsPanel, BorderLayout.NORTH);
+
+        comboBox.addActionListener(e -> {
+            String opcao = (String) comboBox.getSelectedItem();
+            boolean isOrdenada = "Listar Ordenadas".equals(opcao);
+            criterioLabel.setVisible(isOrdenada);
+            criterioField.setVisible(isOrdenada);
+            if (!isOrdenada) {
+                criterioField.setText("");
+            }
+        });
+
+        listarButton.addActionListener(e -> {
+            areaTarefas.setText(""); // Limpa a área de texto antes de listar
+
+            if ("Listar Todas".equals(comboBox.getSelectedItem())) {
+                List<Atividades> todasTarefas = tarefaController.listarTarefas();
+                for (Atividades tarefa : todasTarefas) {
+                    // Adiciona uma linha formatada para cada tarefa
+                    areaTarefas.append(formatarTarefa(tarefa) + "\n---------------------------------\n");
+                }
+            } else if ("Listar Ordenadas".equals(comboBox.getSelectedItem())) {
+                String criterio = criterioField.getText();
+                if (criterio.isEmpty()) {
+                    JOptionPane.showMessageDialog(panel, "Por favor, preencha o critério para ordenação.", 
+                                                  "Erro", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    List<Atividades> tarefasOrdenadas = tarefaController.listarTarefasOrdenadas(criterio);
+                    for (Atividades tarefa : tarefasOrdenadas) {
+                        areaTarefas.append(formatarTarefa(tarefa) + "\n---------------------------------\n");
+                    }
+                }
+            }
+        });
 
         return panel;
     }
 
-    private void atualizarListaTarefas() {
+    // Método auxiliar para formatar a exibição de cada tarefa com estilo
+    private String formatarTarefa(Atividades tarefa) {
+        return String.format(
+            "Nome: %s\nDescrição: %s\nData: %s\nCategoria: %s",
+            tarefa.getNome(), tarefa.getDescricao(), tarefa.getData(), tarefa.getCategoria()
+        );
+    }
+
+
+
+   private void atualizarListaTarefas() {
         JTextArea areaTarefas = new JTextArea();
         StringBuilder tarefasTexto = new StringBuilder();
         for (Tarefa tarefa : tarefas) {
             tarefasTexto.append(tarefa.toString()).append("\n");
         }
         areaTarefas.setText(tarefasTexto.toString());
+        
+        String nome = JOptionPane.showInputDialog("Digite o nome da tarefa:");
+        TarefaController tarefaController = new TarefaController();
+
+        Atividades tarefa = tarefaController.buscarTarefa(nome);
+
+        if (tarefa != null) {
+            JOptionPane.showMessageDialog(null, "Tarefa encontrada:\n" +
+                    "Nome: " + tarefa.getNome() + "\n" +
+                    "Descrição: " + tarefa.getDescricao() + "\n" +
+                    "Categoria: " + tarefa.getCategoria());
+        }
     }
+   // Tela filtrar
 
     private JPanel criarTelaFiltrarTarefas() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -230,10 +293,10 @@ class TelaMenu extends JFrame {
 
       //  JButton voltarButton = new JButton("Voltar à Tela Inicial");
 
+        String[] categorias = {"Estudos", "Doméstico", "Trabalho", "Variados"};
+        JComboBox<String> categoriaComboBox = new JComboBox<>(categorias);
         filterPanel.add(new JLabel("Categoria:"));
-        filterPanel.add(categoriaField);
-        filterPanel.add(new JLabel(""));
-        filterPanel.add(filtrarButton);
+        filterPanel.add(categoriaComboBox); // Adicionando JComboBox para categorias
 
         panel.add(filterPanel, BorderLayout.NORTH);
         panel.add(new JScrollPane(areaFiltrada), BorderLayout.CENTER);
