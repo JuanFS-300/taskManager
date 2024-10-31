@@ -1,0 +1,200 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JOptionPane;
+
+public class TarefaController {
+    private Connection connection;
+
+    private final static String USER = "root";
+    private final static String PASS = "Jfsc2003_";
+    private final static String DATABASE = "TaskManager";
+    private final static String URL = "jdbc:mysql://localhost:3306/" + DATABASE;
+
+    public TarefaController() {
+        try {
+            this.connection = DriverManager.getConnection(URL, USER, PASS);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao conectar ao banco de dados: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void adicionarTarefa(String nome, String descricao, String categoria, String data_dia, String data_mes, String data_ano) {
+        // 1. Inserir a data na tabela datas
+        String dataSQL = "INSERT INTO datas (dia, mes, ano) VALUES (?, ?, ?)";
+        // 2. Inserir a tarefa na tabela Tarefas
+        String tarefaSQL = "INSERT INTO Tarefas (nome_tarefa, descricao, categoria, data_id) VALUES (?, ?, ?, ?)";
+        int dataId = -1;
+
+        try {
+            // Inicia uma transação
+            connection.setAutoCommit(false);
+
+            // Inserindo a data
+            try (PreparedStatement dataStmt = connection.prepareStatement(dataSQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                dataStmt.setInt(1, Integer.parseInt(data_dia));
+                dataStmt.setInt(2, Integer.parseInt(data_mes));
+                dataStmt.setInt(3, Integer.parseInt(data_ano));
+                dataStmt.executeUpdate();
+
+                // Recuperando o ID gerado para a data
+                try (ResultSet generatedKeys = dataStmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        dataId = generatedKeys.getInt(1);
+                    } else {
+                        throw new SQLException("Falha ao obter o ID da data.");
+                    }
+                }
+            }
+
+            // Inserindo a tarefa
+            try (PreparedStatement tarefaStmt = connection.prepareStatement(tarefaSQL)) {
+                tarefaStmt.setString(1, nome);
+                tarefaStmt.setString(2, descricao);
+                tarefaStmt.setString(3, categoria);
+                tarefaStmt.setInt(4, dataId); // Vinculando o ID da data à tarefa
+
+                int res = tarefaStmt.executeUpdate();
+                if (res > 0) {
+                    JOptionPane.showMessageDialog(null, "Tarefa adicionada com sucesso ao banco de dados!");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Falha ao adicionar a tarefa.");
+                }
+            }
+
+            // Commitando a transação
+            connection.commit();
+
+        } catch (SQLException e) {
+            // Em caso de erro, faz o rollback da transação
+            try {
+                connection.rollback();
+            } catch (SQLException rollbackEx) {
+                JOptionPane.showMessageDialog(null, "Erro ao fazer rollback: " + rollbackEx.getMessage());
+            }
+            JOptionPane.showMessageDialog(null, "Erro ao adicionar a tarefa: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                connection.setAutoCommit(true); // Restaura o autocommit
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    public Atividades buscarTarefa(String nome) {
+        String tarefaSQL = "SELECT t.*, d.dia, d.mes, d.ano " +
+                           "FROM Tarefas t " +
+                           "JOIN datas d ON t.data_id = d.id " +  // Supondo que data_id exista na tabela Tarefas
+                           "WHERE t.nome_tarefa = ?";
+        Atividades tarefa = null;
+
+        try (PreparedStatement stmt = connection.prepareStatement(tarefaSQL)) {
+            stmt.setString(1, nome);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                int id = rs.getInt("t.id");
+                String descricao = rs.getString("descricao");
+                String categoria = rs.getString("categoria");
+                // Formata a data como "dia/mês/ano"
+                String data = rs.getInt("dia") + "/" + rs.getInt("mes") + "/" + rs.getInt("ano");
+
+                tarefa = new Atividades(categoria, nome, descricao, data , id);
+            } else {
+                JOptionPane.showMessageDialog(null, "Tarefa não encontrada.");
+            }
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao buscar a tarefa: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return tarefa;
+    }
+    
+    public List<Atividades> listarTarefas() {
+        List<Atividades> tarefas = new ArrayList<>();
+        String query = "SELECT t.*, d.dia, d.mes, d.ano FROM Tarefas t JOIN datas d ON t.data_id = d.id";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String nome = rs.getString("nome_tarefa");
+                String descricao = rs.getString("descricao");
+                String categoria = rs.getString("categoria");
+                String data = rs.getInt("dia") + "/" + rs.getInt("mes") + "/" + rs.getInt("ano");
+
+                tarefas.add(new Atividades(categoria, nome, descricao, data, id));
+            }
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao listar tarefas: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return tarefas;
+    }
+
+    // Método para listar tarefas ordenadas por um critério específico
+    public List<Atividades> listarTarefasOrdenadas(String criterio) {
+        List<Atividades> tarefas = new ArrayList<>();
+        String query = "SELECT t.*, d.dia, d.mes, d.ano FROM Tarefas t JOIN datas d ON t.data_id = d.id ORDER BY " + criterio;
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String nome = rs.getString("nome_tarefa");
+                String descricao = rs.getString("descricao");
+                String categoria = rs.getString("categoria");
+                String data = rs.getInt("dia") + "/" + rs.getInt("mes") + "/" + rs.getInt("ano");
+
+                tarefas.add(new Atividades(categoria, nome, descricao, data, id));
+            }
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao listar tarefas ordenadas: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return tarefas;
+    }
+
+    /* public Atividades buscarCategoria(String nome) {
+        String tarefaSQL = "SELECT * FROM Tarefas";
+        Atividades tarefa = null;
+
+        try (PreparedStatement stmt = connection.prepareStatement(tarefaSQL)) {
+            stmt.setString(1, nome);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                int id = rs.getInt("t.id");
+                String descricao = rs.getString("descricao");
+                String categoria = rs.getString("categoria");
+                // Formata a data como "dia/mês/ano"
+                String data = rs.getInt("dia") + "/" + rs.getInt("mes") + "/" + rs.getInt("ano");
+
+                tarefa = new Atividades(categoria, nome, descricao, data , id);
+            } else {
+                JOptionPane.showMessageDialog(null, "Tarefa não encontrada.");
+            }
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao buscar a tarefa: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return tarefa;
+    }*/
+}
